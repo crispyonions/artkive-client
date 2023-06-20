@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { loginUser, registerUser } from "../managers/AuthManager";
-import "./Auth.css";
+import React, { useRef } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { loginUser } from "../managers/AuthManager"
+import "./Auth.css"
 
 const Login = () => {
   const username = useRef();
@@ -19,7 +19,7 @@ const Login = () => {
       .then((res) => {
         if ("valid" in res && res.valid && "token" in res) {
           localStorage.setItem("lu_token", res.token);
-          navigate("/");
+          navigate("/home");
         } else {
           invalidDialog.current.showModal();
         }

@@ -1,52 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export const UploadImage = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [tags, setTags] = useState([]);
+  const [imageLink, setImageLink] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
   const [description, setDescription] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("");
+  const [folders, setFolders] = useState([]);
+  const [uploadStatus, setUploadStatus] = useState("");
+
+  const tags = [
+    { pk: 1, fields: { tag_name: "portrait" } },
+    { pk: 2, fields: { tag_name: "still life" } },
+    { pk: 3, fields: { tag_name: "animals" } },
+    { pk: 4, fields: { tag_name: "nature" } },
+    { pk: 5, fields: { tag_name: "fantasy" } },
+    { pk: 6, fields: { tag_name: "poses" } },
+    { pk: 7, fields: { tag_name: "flowers" } },
+    { pk: 8, fields: { tag_name: "food" } },
+    { pk: 9, fields: { tag_name: "abstract" } },
+    { pk: 10, fields: { tag_name: "cityscape" } },
+  ];
+
+  useEffect(() => {
+    fetchFolders();
+  }, []);
+
+  const fetchFolders = () => {
+    fetch("http://localhost:8000/folders/", {
+      headers: {
+        Authorization: `Token ${localStorage.getItem("lu_token")}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setFolders(data);
+      })
+      .catch((error) => console.error("Error fetching folders:", error));
+  };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedImage(file);
+    const link = e.target.value.trim();
+    setImageLink(link);
   };
 
   const handleTagChange = (e) => {
-    const tag = e.target.value;
-    if (e.target.checked) {
-      setTags((prevTags) => [...prevTags, tag]);
+    const tagId = Number(e.target.value);
+    const isChecked = e.target.checked;
+
+    if (isChecked) {
+      setSelectedTags((prevTags) => [...prevTags, tagId]);
     } else {
-      setTags((prevTags) => prevTags.filter((t) => t !== tag));
+      setSelectedTags((prevTags) => prevTags.filter((t) => t !== tagId));
     }
   };
 
   const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
+    const desc = e.target.value;
+    setDescription(desc);
+  };
+
+  const handleFolderChange = (e) => {
+    const folderId = e.target.value;
+    setSelectedFolder(folderId);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Create a FormData object to send the image and other data
-    const formData = new FormData();
-    formData.append("image", selectedImage);
-    formData.append("tags", JSON.stringify(tags));
-    formData.append("description", description);
+    if (!imageLink) {
+      setUploadStatus("Please enter an image link.");
+      return;
+    }
 
-    // Make an API request to upload the image
-    // Replace the "uploadImageEndpoint" with your actual API endpoint for image upload
-    fetch("uploadImageEndpoint", {
+    if (!selectedFolder) {
+      setUploadStatus("Please select a folder.");
+      return;
+    }
+
+    const imageData = {
+      description: description,
+      img_url: imageLink,
+      image_folders: selectedFolder,
+      image_tags: selectedTags,
+    };
+
+    fetch("http://localhost:8000/images/", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${localStorage.getItem("lu_token")}`,
+      },
+      body: JSON.stringify(imageData),
     })
       .then((response) => response.json())
       .then((data) => {
-        // Handle the API response as needed
-        console.log(data);
+        setUploadStatus("Image uploaded successfully.");
       })
-      .catch((error) => {
-        // Handle any errors that occur during the API request
-        console.error(error);
-      });
+      .catch((error) => console.error("Error uploading image:", error));
   };
 
   return (
@@ -54,30 +104,61 @@ export const UploadImage = () => {
       <h2>Upload Image</h2>
 
       <div>
-        <label htmlFor="imageUpload">Select Image:</label>
-        <input type="file" id="imageUpload" accept="image/*" onChange={handleImageChange} />
+        <label htmlFor="imageLink">Image Link:</label>
+        <input
+          type="text"
+          id="imageLink"
+          value={imageLink}
+          onChange={handleImageChange}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="folder">Select Folder:</label>
+        <select
+          id="folder"
+          value={selectedFolder}
+          onChange={handleFolderChange}
+        >
+          <option value="">-- Select Folder --</option>
+          {folders.map((folder) => (
+            <option key={folder.pk} value={folder.pk}>
+              {folder.folder_name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
         <label>Tags:</label>
-        <div>
-          <input type="checkbox" id="tag1" value="tag1" onChange={handleTagChange} />
-          <label htmlFor="tag1">Tag 1</label>
-        </div>
-        <div>
-          <input type="checkbox" id="tag2" value="tag2" onChange={handleTagChange} />
-          <label htmlFor="tag2">Tag 2</label>
-        </div>
-        {/* Add more checkbox inputs for other tags */}
+        {tags.map((tag) => (
+          <div key={tag.pk}>
+            <input
+              type="checkbox"
+              id={`tag-${tag.pk}`}
+              value={tag.pk}
+              onChange={handleTagChange}
+              checked={selectedTags.includes(tag.pk)}
+            />
+            <label htmlFor={`tag-${tag.pk}`}>{tag.fields.tag_name}</label>
+          </div>
+        ))}
       </div>
 
       <div>
         <label htmlFor="description">Description:</label>
-        <textarea id="description" value={description} onChange={handleDescriptionChange} />
+        <textarea
+          id="description"
+          value={description}
+          onChange={handleDescriptionChange}
+        />
       </div>
 
       <button type="submit">Upload</button>
+
+      {uploadStatus && <p>{uploadStatus}</p>}
     </form>
   );
 };
-export default UploadImage
+
+export default UploadImage;

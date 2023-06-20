@@ -1,6 +1,6 @@
 import React, { useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { loginUser, registerUser } from "../managers/AuthManager";
+import { registerUser } from "../managers/AuthManager"
 import "./Auth.css"
 
 export const Register = () => {
@@ -29,7 +29,7 @@ export const Register = () => {
                 .then(res => {
                     if ("token" in res) {
                         localStorage.setItem("lu_token", res.token)
-                        navigate("/")
+                        navigate("/home")
                     }
                 })
         } else {
