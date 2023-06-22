@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { getFolders, createFolder, deleteFolder, getImagesByFolder } from '../managers/FolderManager';
 
 const Profile = () => {
   const { userId } = useParams();
@@ -7,7 +8,9 @@ const Profile = () => {
   const [userFolders, setUserFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [newFolderName, setNewFolderName] = useState('');
-  const [showNewFolderInput, setShowNewFolderInput] = useState(false); // Track the state of new folder input visibility
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [folderImages, setFolderImages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null); // Newly added state
 
   useEffect(() => {
     const fetchUserData = () => {
@@ -24,12 +27,7 @@ const Profile = () => {
     };
 
     const fetchUserFolders = () => {
-      fetch(`http://localhost:8000/folders/`, {
-        headers: {
-          Authorization: `Token ${localStorage.getItem('lu_token')}`,
-        },
-      })
-        .then(response => response.json())
+      getFolders()
         .then(data => {
           setUserFolders(data);
         })
@@ -41,51 +39,56 @@ const Profile = () => {
   }, [userId]);
 
   const handleFolderClick = folderId => {
+    setSelectedFolder(selectedFolder === folderId ? null : folderId);
     if (selectedFolder === folderId) {
-      setSelectedFolder(null);
+      setFolderImages([]);
     } else {
-      setSelectedFolder(folderId);
+      getImagesByFolder(folderId)
+        .then(data => {
+          setFolderImages(data);
+        })
+        .catch(error => console.error('Error fetching folder images:', error));
     }
   };
 
-  const handleNewFolderNameChange = event => {
-    setNewFolderName(event.target.value);
+  const handleNewFolderNameChange = e => {
+    setNewFolderName(e.target.value);
   };
 
   const handleCreateFolder = () => {
-    fetch('http://localhost:8000/folders/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Token ${localStorage.getItem('lu_token')}`,
-      },
-      body: JSON.stringify({ folder_name: newFolderName }),
-    })
-      .then(response => response.json())
+    if (newFolderName.trim() === '') {
+      console.error('Folder name cannot be empty');
+      return;
+    }
+
+    createFolder({ folder_name: newFolderName })
       .then(data => {
         setUserFolders([...userFolders, data]);
         setNewFolderName('');
+        setIsCreatingFolder(false);
       })
       .catch(error => console.error('Error creating folder:', error));
   };
 
+  const handleCancelCreateFolder = () => {
+    setIsCreatingFolder(false);
+    setNewFolderName('');
+  };
+
   const handleDeleteFolder = folderId => {
-    fetch(`http://localhost:8000/folders/${folderId}/`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Token ${localStorage.getItem('lu_token')}`,
-      },
-    })
+    deleteFolder(folderId)
       .then(() => {
         setUserFolders(userFolders.filter(folder => folder.id !== folderId));
-        setSelectedFolder(null);
+        if (selectedFolder === folderId) {
+          setSelectedFolder(null);
+          setFolderImages([]);
+        }
       })
       .catch(error => console.error('Error deleting folder:', error));
   };
 
-  const handleToggleNewFolderInput = () => {
-    setShowNewFolderInput(prevState => !prevState);
-    setNewFolderName('');
+  const handleImageClick = image => {
+    setSelectedImage(image);
   };
 
   return (
@@ -98,64 +101,57 @@ const Profile = () => {
 
           <div>
             <h4>Create New Folder:</h4>
-            {!showNewFolderInput ? (
-              <button onClick={handleToggleNewFolderInput}>
-                Add New Folder
-              </button>
+            {!isCreatingFolder ? (
+              <button onClick={() => setIsCreatingFolder(true)}>Add Folder</button>
             ) : (
               <div>
-                <input
-                  type="text"
-                  placeholder="Folder Name"
-                  value={newFolderName}
-                  onChange={handleNewFolderNameChange}
-                />
-                <button onClick={handleCreateFolder}>Create</button>
-                <button onClick={handleToggleNewFolderInput}>
-                  Cancel
-                </button>
+                <input type="text" value={newFolderName} onChange={handleNewFolderNameChange} />
+                <button onClick={handleCreateFolder}>Submit</button>
+                <button onClick={handleCancelCreateFolder}>Cancel</button>
               </div>
             )}
-          </div>
 
-          {userFolders && userFolders.length > 0 ? (
-            <div>
-              <h4>Saved Folders:</h4>
-              <ul>
-                {userFolders.map(folder => (
-                  <li key={folder.id}>
-                    <a href="#" onClick={() => handleFolderClick(folder.id)}>
-                      {folder.folder_name}
-                    </a>
-                    {selectedFolder === folder.id && (
-                      <div>
-                        <h5>Images in the folder:</h5>
-                        <ul>
-                          {folder.images && folder.images.length > 0 ? (
-                            folder.images.map(image => (
-                              <li key={image.id}>
-                                <img
-                                  src={image.img_url}
-                                  alt={image.description}
-                                />
-                              </li>
-                            ))
-                          ) : (
-                            <li>No images in the folder.</li>
-                          )}
-                        </ul>
-                        <button onClick={() => handleDeleteFolder(folder.id)}>
-                          Delete Folder
-                        </button>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <p>No saved folders.</p>
-          )}
+            {userFolders && userFolders.length > 0 ? (
+              <div>
+                <h4>Saved Folders:</h4>
+                <li className="folder-list">
+                  {userFolders.map(folder => (
+                    <li key={folder.id}>
+                      <button
+                        type="button"
+                        className="link-button"
+                        onClick={() => handleFolderClick(folder.id)}
+                      >
+                        {folder.folder_name}
+                      </button>
+
+                      {selectedFolder === folder.id && (
+                        <div>
+                          <h5>Images in the folder:</h5>
+                          <ul>
+                            {folderImages && folderImages.length > 0 ? (
+                              folderImages.map(image => (
+                                <li key={image.id}>
+                                  <Link to={`/image/${image.id}`} onClick={() => handleImageClick(image)}>
+                                    <img src={image.img_url} alt={image.description} />
+                                  </Link>
+                                </li>
+                              ))
+                            ) : (
+                              <li>No images in the folder.</li>
+                            )}
+                          </ul>
+                          <button onClick={() => handleDeleteFolder(folder.id)}>Delete Folder</button>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </li>
+              </div>
+            ) : (
+              <p>No saved folders.</p>
+            )}
+          </div>
         </div>
       ) : (
         <div>Loading user data...</div>

@@ -1,56 +1,51 @@
 import React, { useState, useEffect } from "react";
+import ImageDetailsPage from "../components/ImageDetailsPage";
+import { getFolders } from "../managers/FolderManager.js";
+import { createImage } from "../managers/ImageManager.js";
+import { getTags } from "../managers/TagManager.js";
+import './UploadImage.css';
 
 export const UploadImage = () => {
   const [imageLink, setImageLink] = useState("");
-  const [selectedTags, setSelectedTags] = useState([]);
   const [description, setDescription] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("");
   const [folders, setFolders] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [uploadStatus, setUploadStatus] = useState("");
-
-  const tags = [
-    { pk: 1, fields: { tag_name: "portrait" } },
-    { pk: 2, fields: { tag_name: "still life" } },
-    { pk: 3, fields: { tag_name: "animals" } },
-    { pk: 4, fields: { tag_name: "nature" } },
-    { pk: 5, fields: { tag_name: "fantasy" } },
-    { pk: 6, fields: { tag_name: "poses" } },
-    { pk: 7, fields: { tag_name: "flowers" } },
-    { pk: 8, fields: { tag_name: "food" } },
-    { pk: 9, fields: { tag_name: "abstract" } },
-    { pk: 10, fields: { tag_name: "cityscape" } },
-  ];
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     fetchFolders();
+    fetchTags();
   }, []);
 
   const fetchFolders = () => {
-    fetch("http://localhost:8000/folders/", {
-      headers: {
-        Authorization: `Token ${localStorage.getItem("lu_token")}`,
-      },
-    })
-      .then((response) => response.json())
+    getFolders()
       .then((data) => {
         setFolders(data);
       })
       .catch((error) => console.error("Error fetching folders:", error));
   };
 
+  const fetchTags = () => {
+    getTags()
+      .then((data) => {
+        console.log(data);
+        setTags(data);
+      })
+      .catch((error) => console.error("Error fetching tags:", error));
+  };
+
   const handleImageChange = (e) => {
     const link = e.target.value.trim();
     setImageLink(link);
-  };
 
-  const handleTagChange = (e) => {
-    const tagId = Number(e.target.value);
-    const isChecked = e.target.checked;
-
-    if (isChecked) {
-      setSelectedTags((prevTags) => [...prevTags, tagId]);
+    // Create image preview
+    if (link) {
+      setImagePreview(link);
     } else {
-      setSelectedTags((prevTags) => prevTags.filter((t) => t !== tagId));
+      setImagePreview(null);
     }
   };
 
@@ -62,6 +57,17 @@ export const UploadImage = () => {
   const handleFolderChange = (e) => {
     const folderId = e.target.value;
     setSelectedFolder(folderId);
+  };
+
+  const handleTagChange = (e) => {
+    const tagId = parseInt(e.target.value);
+    setSelectedTags((prevSelectedTags) => {
+      if (prevSelectedTags.includes(tagId)) {
+        return prevSelectedTags.filter((id) => id !== tagId);
+      } else {
+        return [...prevSelectedTags, tagId];
+      }
+    });
   };
 
   const handleSubmit = (e) => {
@@ -80,30 +86,22 @@ export const UploadImage = () => {
     const imageData = {
       description: description,
       img_url: imageLink,
-      image_folders: selectedFolder,
-      image_tags: selectedTags,
+      folder: parseInt(selectedFolder),
+      tags: selectedTags,
     };
 
-    fetch("http://localhost:8000/images/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${localStorage.getItem("lu_token")}`,
-      },
-      body: JSON.stringify(imageData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
+    createImage(imageData)
+      .then(() => {
         setUploadStatus("Image uploaded successfully.");
       })
       .catch((error) => console.error("Error uploading image:", error));
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="upload-image-form" onSubmit={handleSubmit}>
       <h2>Upload Image</h2>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="imageLink">Image Link:</label>
         <input
           type="text"
@@ -113,7 +111,14 @@ export const UploadImage = () => {
         />
       </div>
 
-      <div>
+      {imagePreview && (
+        <div className="image-preview">
+          <h3>Image Preview:</h3>
+          <img src={imagePreview} alt="Preview" />
+        </div>
+      )}
+
+      <div className="form-group">
         <label htmlFor="folder">Select Folder:</label>
         <select
           id="folder"
@@ -122,30 +127,32 @@ export const UploadImage = () => {
         >
           <option value="">-- Select Folder --</option>
           {folders.map((folder) => (
-            <option key={folder.pk} value={folder.pk}>
+            <option key={folder.id} value={folder.id}>
               {folder.folder_name}
             </option>
           ))}
         </select>
       </div>
 
-      <div>
-        <label>Tags:</label>
-        {tags.map((tag) => (
-          <div key={tag.pk}>
-            <input
-              type="checkbox"
-              id={`tag-${tag.pk}`}
-              value={tag.pk}
-              onChange={handleTagChange}
-              checked={selectedTags.includes(tag.pk)}
-            />
-            <label htmlFor={`tag-${tag.pk}`}>{tag.fields.tag_name}</label>
-          </div>
-        ))}
+      <div className="form-group">
+        <label htmlFor="tags">Select Tags:</label>
+        <div className="checkbox-group">
+          {tags.map((tag) => (
+            <label key={tag.id}>
+              <input
+                type="checkbox"
+                name="tags"
+                value={tag.id}
+                checked={selectedTags.includes(tag.id)}
+                onChange={handleTagChange}
+              />
+              {tag.tag_name}
+            </label>
+          ))}
+        </div>
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="description">Description:</label>
         <textarea
           id="description"

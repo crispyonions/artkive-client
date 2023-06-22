@@ -22,13 +22,13 @@ export const NavBar = () => {
             </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/uploadimage">
-              Upload Image
+            <Link className="nav-link" to="/profile">
+              Profile
             </Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link" to="/profile">
-              Profile
+            <Link className="nav-link" to="/uploadimage">
+              Upload Image
             </Link>
           </li>
           <li className="nav-item">

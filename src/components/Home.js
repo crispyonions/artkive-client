@@ -29,9 +29,13 @@ const Home = () => {
       <p>your place of reference</p>
 
       {randomImage && (
-        <div>
+        <div className="homepage-image-container">
           <h3>Random Image:</h3>
-          <img src={randomImage.url} alt="Random" />
+          <img
+            className="homepage-image"
+            src={randomImage.url}
+            alt="Random"
+          />
           <p>{randomImage.description}</p>
         </div>
       )}

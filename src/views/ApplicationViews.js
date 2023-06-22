@@ -6,6 +6,7 @@ import Authorized from './Authorized';
 import UploadImage from '../components/UploadImage';
 import Home from '../components/Home';
 import Profile from '../components/Profile';
+import ImageDetailsPage from '../components/ImageDetailsPage';
 
 export const ApplicationViews = () => {
   return (
@@ -15,6 +16,7 @@ export const ApplicationViews = () => {
       <Route path="/uploadimage" element={<UploadImage />} />
       <Route path="/home" element={<Home />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/image/:id" element={<ImageDetailsPage />} />
       <Route path="/" element={<Login />} index={true} /> 
       <Route element={<Authorized />} />
     </Routes>
