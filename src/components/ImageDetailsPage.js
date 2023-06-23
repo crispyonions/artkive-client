@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { deleteImage } from '../managers/ImageManager';
+import './ImageDetailsPage.css';
 
 const ImageDetailsPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [isDeleted, setIsDeleted] = useState(false);
 
@@ -33,8 +35,8 @@ const ImageDetailsPage = () => {
     deleteImage(id)
       .then(() => {
         console.log(`Image with ID ${id} deleted successfully`);
-        setIsDeleted(true); // Update the deletion status
-        // Optionally, you can navigate the user back to a different page after deletion
+        setIsDeleted(true);
+        navigate('/home'); // Redirect to the home page
       })
       .catch(error => {
         console.error('Error deleting image:', error);
@@ -43,23 +45,21 @@ const ImageDetailsPage = () => {
 
   const handleEdit = () => {
     const newDescription = prompt('Enter a new description:', image.description);
-    
+
     if (newDescription) {
       const updatedImage = {
         ...image,
         description: newDescription,
       };
 
-      // Simulate the update by setting the state directly
       setImage(updatedImage);
     }
   };
 
   return (
-    <div>
-      <h2>Image Details</h2>
+    <div className="container">
       {image && !isDeleted && (
-        <div>
+        <div className="image-details">
           <p>{image.description}</p>
           <img src={image.img_url} alt={image.description} />
         </div>
@@ -67,8 +67,10 @@ const ImageDetailsPage = () => {
 
       {isDeleted && <p>Image deleted successfully.</p>}
 
-      <button onClick={handleDelete}>Delete</button>
-      <button onClick={handleEdit}>Edit</button>
+      <div className="button-group">
+        <button onClick={handleDelete}>Delete Image</button>
+        <button onClick={handleEdit}>Edit Description</button>
+      </div>
     </div>
   );
 };

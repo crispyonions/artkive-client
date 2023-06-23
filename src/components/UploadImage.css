@@ -1,9 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@1,400&display=swap');
+
+/* Typography */
+body, button, input, select, textarea {
+  color: #404040;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  max-height: 80vh; /* Adjust the value as needed */
+  overflow-y: auto; /* Add vertical scroll if necessary */
+}
+
 .upload-image-form {
   max-width: 90%;
   margin: 0 auto;
   padding: 19px;
   background-color: #f7f2f2;
   border-radius: 8px;
+  overflow: auto; /* Add scroll if necessary */
 }
 
 .upload-image-form h2 {
@@ -23,7 +41,7 @@
 input[type="text"],
 textarea,
 select {
-  width: 100%;
+  width: calc(100% - 20px); /* Adjust the width as needed */
   padding: 10px;
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -35,9 +53,21 @@ select {
   margin-top: 10px;
 }
 
+.checkbox-group {
+  display: flex; /* Display the tags in a flex container */
+  flex-wrap: wrap; /* Allow tags to wrap to a new line */
+  margin-bottom: -5px; /* Remove the bottom margin */
+}
+
 .checkbox-group label {
-  display: block;
+  display: flex; /* Align checkboxes and tag names horizontally */
+  align-items: center;
   margin-bottom: 5px;
+  margin-right: 10px; /* Add spacing between tags */
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 5px; /* Add spacing between checkbox and tag name */
 }
 
 button[type="submit"] {

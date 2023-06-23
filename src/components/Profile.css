@@ -1,0 +1,77 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: calc(100vh - <headerHeight> - <navBarHeight>);
+    overflow-y: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .user-info {
+    text-align: left;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+  
+  .create-folder-section {
+    text-align: left;
+    margin-bottom: 10px;
+  }
+  
+  .saved-folders {
+    text-align: left;
+    margin-top: 10px;
+  }
+  
+  .folder-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .create-folder-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .folder-list li {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .folder-list li img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+  }
+  
+  .folder-images {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .folder-images li {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .folder-images li img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+  }
+  

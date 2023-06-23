@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./Home.css";
 
 const Home = () => {
   const [randomImage, setRandomImage] = useState(null);
@@ -24,23 +25,16 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <div className="homepage-container"> {/* Updated class name */}
       <h2>artkive</h2>
       <p>your place of reference</p>
-
-      {randomImage && (
-        <div className="homepage-image-container">
-          <h3>Random Image:</h3>
-          <img
-            className="homepage-image"
-            src={randomImage.url}
-            alt="Random"
-          />
-          <p>{randomImage.description}</p>
-        </div>
-      )}
-
       <button onClick={handleGenerateImage}>Generate Random Image</button>
+      {randomImage && (
+    <div className="homepage-image-container">
+      <p>{randomImage.description}</p>
+    <img className="homepage-image" src={randomImage.url} alt="Random" />
+    </div>
+  )}
     </div>
   );
 };

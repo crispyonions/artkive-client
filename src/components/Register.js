@@ -48,28 +48,28 @@ export const Register = () => {
             <form className="form--login" onSubmit={handleRegister}>
                 <h1 className="h3 mb-3 font-weight-normal">Register an account</h1>
                 <fieldset>
-                    <label htmlFor="firstName"> First Name </label>
-                    <input ref={firstName} type="text" name="firstName" className="form-control" placeholder="First name" required autoFocus />
+                    <label htmlFor="firstName"> first name </label>
+                    <input ref={firstName} type="text" name="firstName" className="form-control" placeholder="first name" required autoFocus />
                 </fieldset>
                 <fieldset>
-                    <label htmlFor="lastName"> Last Name </label>
-                    <input ref={lastName} type="text" name="lastName" className="form-control" placeholder="Last name" required />
+                    <label htmlFor="lastName"> last name </label>
+                    <input ref={lastName} type="text" name="lastName" className="form-control" placeholder="last name" required />
                 </fieldset>
                 <fieldset>
-                    <label htmlFor="inputUsername">Username</label>
-                    <input ref={username} type="text" name="username" className="form-control" placeholder="Username" required />
+                    <label htmlFor="inputUsername">username</label>
+                    <input ref={username} type="text" name="username" className="form-control" placeholder="username" required />
                 </fieldset>
                 <fieldset>
-                    <label htmlFor="inputPassword"> Password </label>
-                    <input ref={password} type="password" name="password" className="form-control" placeholder="Password" required />
+                    <label htmlFor="inputPassword"> password </label>
+                    <input ref={password} type="password" name="password" className="form-control" placeholder="password" required />
                 </fieldset>
                 <fieldset>
-                    <label htmlFor="verifyPassword"> Verify Password </label>
-                    <input ref={verifyPassword} type="password" name="verifyPassword" className="form-control" placeholder="Verify password" required />
+                    <label htmlFor="verifyPassword"> verify password </label>
+                    <input ref={verifyPassword} type="password" name="verifyPassword" className="form-control" placeholder="verify password" required />
                 </fieldset>
                 <fieldset>
-                    <label htmlFor="verifyPassword"> User Bio </label>
-                    <textarea ref={bio} name="bio" className="form-control" placeholder="Let others know a little bit about you <3" />
+                    <label htmlFor="verifyPassword"> artist bio </label>
+                    <textarea ref={bio} name="bio" className="form-control" />
                 </fieldset>
                 <fieldset style={{
                     textAlign: "center"
@@ -78,7 +78,7 @@ export const Register = () => {
                 </fieldset>
             </form>
             <section className="link--register">
-                Already registered? <Link to="/login">Login</Link>
+                already registered? <Link to="/login">login</Link>
             </section>
         </main>
     )

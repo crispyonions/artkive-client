@@ -3,7 +3,7 @@ import ImageDetailsPage from "../components/ImageDetailsPage";
 import { getFolders } from "../managers/FolderManager.js";
 import { createImage } from "../managers/ImageManager.js";
 import { getTags } from "../managers/TagManager.js";
-import './UploadImage.css';
+import "./UploadImage.css";
 
 export const UploadImage = () => {
   const [imageLink, setImageLink] = useState("");
@@ -98,73 +98,76 @@ export const UploadImage = () => {
   };
 
   return (
-    <form className="upload-image-form" onSubmit={handleSubmit}>
-      <h2>Upload Image</h2>
+    <div className="container">
+      <form className="upload-image-form" onSubmit={handleSubmit}>
+        <h2>Upload Image</h2>
 
-      <div className="form-group">
-        <label htmlFor="imageLink">Image Link:</label>
-        <input
-          type="text"
-          id="imageLink"
-          value={imageLink}
-          onChange={handleImageChange}
-        />
-      </div>
-
-      {imagePreview && (
-        <div className="image-preview">
-          <h3>Image Preview:</h3>
-          <img src={imagePreview} alt="Preview" />
+        <div className="form-group">
+          <label htmlFor="imageLink">Image Link:</label>
+          <input
+            type="text"
+            id="imageLink"
+            value={imageLink}
+            onChange={handleImageChange}
+          />
         </div>
-      )}
 
-      <div className="form-group">
-        <label htmlFor="folder">Select Folder:</label>
-        <select
-          id="folder"
-          value={selectedFolder}
-          onChange={handleFolderChange}
-        >
-          <option value="">-- Select Folder --</option>
-          {folders.map((folder) => (
-            <option key={folder.id} value={folder.id}>
-              {folder.folder_name}
-            </option>
-          ))}
-        </select>
-      </div>
+        {imagePreview && (
+          <div className="image-preview">
+            <h3>Image Preview:</h3>
+            <img src={imagePreview} alt="Preview" />
+          </div>
+        )}
 
-      <div className="form-group">
-        <label htmlFor="tags">Select Tags:</label>
-        <div className="checkbox-group">
-          {tags.map((tag) => (
-            <label key={tag.id}>
-              <input
-                type="checkbox"
-                name="tags"
-                value={tag.id}
-                checked={selectedTags.includes(tag.id)}
-                onChange={handleTagChange}
-              />
-              {tag.tag_name}
-            </label>
-          ))}
+        <div className="form-group">
+          <label htmlFor="folder">Select Folder:</label>
+          <select
+            id="folder"
+            value={selectedFolder}
+            onChange={handleFolderChange}
+          >
+            <option value="">-- Select Folder --</option>
+            {folders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.folder_name}
+              </option>
+            ))}
+          </select>
         </div>
-      </div>
 
-      <div className="form-group">
-        <label htmlFor="description">Description:</label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={handleDescriptionChange}
-        />
-      </div>
+        <div className="form-group">
+          <label htmlFor="tags">Select Tags:</label>
+          <div className="checkbox-group">
+            {tags.map((tag) => (
+              <label key={tag.id}>
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value={tag.id}
+                  checked={selectedTags.includes(tag.id)}
+                  onChange={handleTagChange}
+                />
+                {tag.tag_name}
+              </label>
+            ))}
+          </div>
+        </div>
 
-      <button type="submit">Upload</button>
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <input
+            type="text"
+            id="description"
+            value={description}
+            onChange={handleDescriptionChange}
+          />
+        </div>
 
-      {uploadStatus && <p>{uploadStatus}</p>}
-    </form>
+        <button type="submit">Upload</button>
+      </form>
+
+      {uploadStatus && <p className="upload-status">{uploadStatus}</p>}
+    </div>
   );
 };
 
